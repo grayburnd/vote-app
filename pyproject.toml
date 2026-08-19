@@ -1,0 +1,72 @@
+[project]
+name = "vote"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "grayburnd", email = "grayburnd@yahoo.co.uk" }
+]
+requires-python = ">=3.14, <4"
+dependencies = [
+    "black>=26.5.1",
+    "flask~=3.1.3",
+    "gunicorn>=26.0.0",
+    "isort>=8.0.1",
+    "python-json-logger>=4.1.0",
+    "pyyaml>=6.0.3",
+    "redis~=8.1.0",
+    "ruff>=0.16.3",
+]
+
+[tool.pytest.ini_options]
+addopts = "-rA -s -v"
+markers = [
+    "unit: quick unit tests",
+    "resilience: tests resilience of retry logic"
+]
+
+[tool.ruff]
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+]
+line-length = 80
+
+[tool.black]
+line-length = 80
+
+[tool.mypy]
+warn_return_any = true
+warn_unused_configs = true
+warn_no_return = false
+
+[tool.bandit]
+exclude_dirs = [".venv", "__pycache__"]
+
+[tool.isort]
+profile = "black"
+line_length = 80
