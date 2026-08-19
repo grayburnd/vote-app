@@ -1,0 +1,25 @@
+version: 1
+disable_existing_loggers: true
+formatters:
+  json:
+    (): pythonjsonlogger.jsonlogger.JsonFormatter  # The custom class python will instantiate
+    fmt: "{asctime}{levelname}{message}"
+    style: "{"
+    json_indent: 4
+    rename_fields:
+      asctime: "timestamp"
+      levelname: "level"
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: json
+    stream: ext://sys.stdout
+loggers:
+  config.json:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+root:
+  level: DEBUG
+  handlers: [console]
