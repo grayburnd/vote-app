@@ -157,8 +157,10 @@ def get_redis() -> redis.Redis:
     else:
         logger.info("Reusing existing _sentinel_client")
 
+    logger.info("Got past sentinel init, LOG INFO")
     # Get the master Redis client from the Sentinel. The master_for method returns a Redis client that is connected to the current master node of the specified master name (service name). This allows the application to always write to the master node.
     op_start = perf_counter()
+    logger.info("PER COUNTER INITIALIZED LOG INFO")
     try: ##Get the master each time a GET or POST request is made as failover may have occured.
         g.redis = _sentinel_client.master_for(  # type: ignore
             master_name,
@@ -167,6 +169,7 @@ def get_redis() -> redis.Redis:
             username=redis_username,
             protocol=2,
         )
+        logger.info("HIT THE TRY BLOCK AND AFTER THE THING")
 
     except RedisError as e:
         REDIS_ERROR_COUNT.labels(e.__class__.__name__).inc() ##Increment with exception value
@@ -178,8 +181,10 @@ def get_redis() -> redis.Redis:
         REDIS_OP_LATENCY.labels("sentinel_master_for").observe(
             perf_counter() - op_start
         )
+        logger.info("HIT THE FINALLY BLOCK")
 
     # Return the Redis client attached to the Flask global object g. Allows redis client to be reused during request.
+    logger.info("REDIS RETURNED")
     return g.redis
 
 
@@ -187,10 +192,11 @@ def get_redis() -> redis.Redis:
 @app.route("/vote", methods=["POST", "GET"])
 def main():
     # Grab the redis client from the Flask global object g. If it doesn't exist, create a new one.
+    logger.info("VOTE GET INIT")
     redis_client = get_redis()
-
+    logger.info("SUCCESFULLY GOT REDIS CLIENT")
     voter_id: str | None = request.cookies.get("voter_id")
-
+    logger.info("PRE IF POST")
     if not voter_id:
         voter_id = hex(random.getrandbits(64))[2:-1] ##Generate random voter ID
 
@@ -215,7 +221,7 @@ def main():
                 perf_counter() - op_start
             )
             VOTE_SUBMISSIONS.labels(vote).inc()
-
+    logger.info("GOT PAST POST")
     vote: str | None = None ##Intiate vote for a GET Request
     # For a GET request, render the index.html with the options dynamically. Vote stays in the background as None until user submits a request. Allows it to be cast dynamically.
     resp = make_response(
@@ -227,8 +233,10 @@ def main():
             vote=vote,
         )
     )
+    logger.info("PAST TEMPLATE")
     # Set the voter id cookie for the duration of the request.
     resp.set_cookie("voter_id", voter_id)
+    logger.info("COOKIE SET, ABOUT TO RETURN RESPONSE")
     return resp
 
 
