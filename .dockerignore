@@ -1,0 +1,12 @@
+# Common
+README.md
+CHANGELOG.md
+docker-compose.yml
+Dockerfile
+.venv
+.git
+__pycache__
+.pytest_cache
+.ruff_cache
+.mypy_cache
+*.pyc

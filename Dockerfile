@@ -9,20 +9,17 @@ RUN apt update && \
 # Set the application directory
 WORKDIR /usr/local/app
 
-# Install our dependencies
-COPY pyproject.toml .
+# Install dependencies
+COPY pyproject.toml uv.lock .
 RUN pip install uv --no-cache-dir
-RUN uv sync
-RUN rm pyproject.toml
+##Install dependencies as per uv.lock file only.
+RUN uv sync --frozen
+RUN rm pyproject.toml uv.lock
 
 # Define the final stage that will bundle the application for production
 FROM base AS final
 
 # Copy our code from the current folder to the working directory inside the container
-# COPY app.py .
-# COPY static/* .
-# COPY templates/* .
-# COPY src/* .
 COPY . .
 
 # Make port 80 available for links and/or publish
@@ -31,4 +28,5 @@ EXPOSE 80
 # Define our command to be run when launching the container
 ENTRYPOINT ["uv"] 
 
-CMD ["run", "gunicorn", "--bind", "0.0.0.0:80", "app:app"]
+##No sync used to ensure that it uses the existing .venv and doesnt install dependencies at runtime
+CMD ["run", "--no-sync", "gunicorn", "--bind", "0.0.0.0:80", "app:app"]
