@@ -11,11 +11,7 @@ import redis
 import yaml
 from flask import Flask, Response, g, make_response, render_template, request
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
-from prometheus_client import (
-    Counter,
-    Histogram,
-    make_wsgi_app
-)
+from prometheus_client import Counter, Histogram, make_wsgi_app
 from redis.exceptions import RedisError
 from redis.sentinel import Sentinel
 
@@ -39,10 +35,7 @@ app = Flask(__name__, static_url_path="/vote/static")
 
 ##Expose metrics endpoint so Prometheus can scrape - https://prometheus.github.io/client_python/exporting/http/flask/
 
-app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
-    '/metrics': make_wsgi_app()
-    }
-    )
+app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {"/metrics": make_wsgi_app()})
 
 # Initialize the sentinel client as None, so that it can be created when needed
 _sentinel_client = None
@@ -79,17 +72,25 @@ VOTE_SUBMISSIONS = Counter(
     labelnames=["vote"],
 )
 
+
 ##Run this function before each request
 @app.before_request
 def _start_request_timer() -> None:
-    g.request_start_time = perf_counter() # Return high-resolution timer for that point in time, prior to serving each request
+    g.request_start_time = (
+        perf_counter()
+    )  # Return high-resolution timer for that point in time, prior to serving each request
+
 
 ##Run this function after each request
 @app.after_request
 def _record_http_metrics(response: Response) -> Response | None:
-    route = request.url_rule.rule if request.url_rule else request.path ##Grab the route which triggered the view in the request, else get the path .. supply this later to the Histogram
+    route = (
+        request.url_rule.rule if request.url_rule else request.path
+    )  ##Grab the route which triggered the view in the request, else get the path .. supply this later to the Histogram
     try:
-        start_time = getattr(g, "request_start_time") ##Get the request start time
+        start_time = getattr(
+            g, "request_start_time"
+        )  ##Get the request start time
         REQUEST_LATENCY.labels(request.method, route).observe(
             perf_counter() - start_time
         )
@@ -139,44 +140,49 @@ def get_redis() -> redis.Redis:
             _sentinel_client = Sentinel(
                 [(sentinel_host.strip(), port)],
                 socket_timeout=5,
+                socket_connect_timeout=5,  ##Without this, a blocked/unreachable TCP connect can hang far longer than socket_timeout allows
                 sentinel_kwargs={
                     "username": redis_username.strip(),
-                    "password": password.strip(), ##Sentinel requires creds
+                    "password": password.strip(),  ##Sentinel requires creds
                 },
             )
         ##Catch all Redis Errors and create a metric based on them
         except RedisError as e:
-            REDIS_ERROR_COUNT.labels(e.__class__.__name__).inc() ##Increment with the exception value
+            REDIS_ERROR_COUNT.labels(
+                e.__class__.__name__
+            ).inc()  ##Increment with the exception value
             msg = f"There has been a Redis Error. Error: {e}"
             logger.critical(msg)
             raise RedisError(msg)
-        
-        finally: ##Label a Redis latency metric and give it the value of the time it takes to intilaize the sentinel connection. Runs only if Redis except not hit.
+
+        finally:  ##Label a Redis latency metric and give it the value of the time it takes to intilaize the sentinel connection. Runs only if Redis except not hit.
             REDIS_OP_LATENCY.labels("sentinel_init").observe(
                 perf_counter() - op_start
             )
     else:
         logger.info("Reusing existing _sentinel_client")
 
-    logger.info("Got past sentinel init, LOG INFO")
     # Get the master Redis client from the Sentinel. The master_for method returns a Redis client that is connected to the current master node of the specified master name (service name). This allows the application to always write to the master node.
     op_start = perf_counter()
-    try: ##Get the master each time a GET or POST request is made as failover may have occured.
+    try:  ##Get the master each time a GET or POST request is made as failover may have occured.
         g.redis = _sentinel_client.master_for(  # type: ignore
             master_name,
             socket_timeout=5,
+            socket_connect_timeout=5,  ##Bounds the initial TCP connect, not just reads/writes on an established socket
             password=password,
             username=redis_username,
             protocol=2,
         )
 
     except RedisError as e:
-        REDIS_ERROR_COUNT.labels(e.__class__.__name__).inc() ##Increment with exception value
+        REDIS_ERROR_COUNT.labels(
+            e.__class__.__name__
+        ).inc()  ##Increment with exception value
         msg = f"There has been a Redis Error. Error: {e}"
         logger.critical(msg)
         raise RedisError(msg)
-    
-    finally: ##How long it takes to get the master
+
+    finally:  ##How long it takes to get the master
         REDIS_OP_LATENCY.labels("sentinel_master_for").observe(
             perf_counter() - op_start
         )
@@ -192,7 +198,7 @@ def main():
     redis_client = get_redis()
     voter_id: str | None = request.cookies.get("voter_id")
     if not voter_id:
-        voter_id = hex(random.getrandbits(64))[2:-1] ##Generate random voter ID
+        voter_id = hex(random.getrandbits(64))[2:-1]  ##Generate random voter ID
 
     if request.method == "POST":
         # Grab the vote from the form data included in index.html and passed through as a Post request by the user.
@@ -205,6 +211,8 @@ def main():
         op_start = perf_counter()
         try:
             redis_client.rpush("votes", json.dumps(vote_data))
+            msg = f"Successfully sent vote for {vote} to Redis."
+            logger.critical(msg)
         except RedisError as e:
             REDIS_ERROR_COUNT.labels(e.__class__.__name__).inc()
             msg = f"Failed to submit vote to Redis. Error: {e}"
@@ -215,7 +223,7 @@ def main():
                 perf_counter() - op_start
             )
             VOTE_SUBMISSIONS.labels(vote).inc()
-    vote: str | None = None ##Intiate vote for a GET Request
+    vote: str | None = None  ##Intiate vote for a GET Request
     # For a GET request, render the index.html with the options dynamically. Vote stays in the background as None until user submits a request. Allows it to be cast dynamically.
     resp = make_response(
         render_template(

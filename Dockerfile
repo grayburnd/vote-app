@@ -9,7 +9,7 @@ RUN apt update && \
 # Set the application directory
 WORKDIR /usr/local/app
 
-# Install dependencies
+# Install dependencies.. importantly uv lock is used as the source of truth.
 COPY pyproject.toml uv.lock .
 RUN pip install uv --no-cache-dir
 ##Install dependencies as per uv.lock file only.
@@ -29,4 +29,4 @@ EXPOSE 80
 ENTRYPOINT ["uv"] 
 
 ##No sync used to ensure that it uses the existing .venv and doesnt install dependencies at runtime
-CMD ["run", "--no-sync", "gunicorn", "--bind", "0.0.0.0:80", "app:app"]
+CMD ["run", "--no-sync", "gunicorn", "--bind", "0.0.0.0:80", "--workers", "2", "--threads", "2", "app:app"]
