@@ -78,7 +78,7 @@ services:
   vote:
     image: 632988741882.dkr.ecr.us-east-1.amazonaws.com/vote-test #latest
     depends_on: ["sentinel-1"]
-    environment: 
+    environment:
       REDIS_SENTINEL_HOST: "sentinel-1"
       REDIS_PASSWORD: "uTvLZ4udFNbUM5qE"
       REDIS_SENTINEL_PORT: "26379"
@@ -89,7 +89,7 @@ services:
   postgres:
     image: postgres
     hostname: postgres
-    environment: 
+    environment:
       POSTGRES_PASSWORD: "dzEFikHj11kN0hxLxEZbToY9RPLdEahruUDeNhBsHWamdfOMT0uUDSEnqn89KQrm"
       POSTGRES_USER: "db_admin"
     ports: ["5432:5432"]
@@ -97,7 +97,7 @@ services:
   worker:
     image: 632988741882.dkr.ecr.us-east-1.amazonaws.com/worker-test #latest
     depends_on: ["postgres", "sentinel-1"]
-    environment: 
+    environment:
       DB_HOST: "postgres"
       DB_PORT: "5432"
       DB_USERNAME: "db_admin"
@@ -113,7 +113,7 @@ services:
   results:
     image: 632988741882.dkr.ecr.us-east-1.amazonaws.com/results-test #latest
     depends_on: ["sentinel-1"]
-    environment: 
+    environment:
       DB_HOST: "postgres"
       DB_PORT: "5432"
       DB_USERNAME: "db_admin"
@@ -149,5 +149,3 @@ services:
   #         target: /data
   #         tmpfs:
   #           size: 10g
-
-  
