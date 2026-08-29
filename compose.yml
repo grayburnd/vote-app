@@ -1,0 +1,153 @@
+name: voting-app
+
+services:
+  redis-master:
+    image: redis:latest
+    container_name: redis-master
+    hostname: redis-master
+    ports:
+      - "6379:6379"
+    # volumes:
+    #   - #/tmp/redis/data/master:/data ##VOLUME:CONTAINER_PATH ##Check as do not have data already
+    environment:
+      REDIS_MASTER_ANNOUNCE_IP: redis-master
+    command:
+      [
+        "redis-server",
+        "--appendonly",
+        "yes",
+        "--repl-diskless-load",
+        "on-empty-db",
+        "--replica-announce-ip",
+        "${REDIS_MASTER_ANNOUNCE_IP}",
+        "--replica-announce-port",
+        "6379",
+        "--protected-mode",
+        "no"
+      ]
+
+  redis-slave-1:
+    image: redis:latest
+    container_name: redis-slave-1
+    hostname: redis-slave-1
+    depends_on:
+      - redis-master
+    ports:
+      - "6380:6379"
+    # volumes:
+    #   - #/tmp/redis/data/slave1:/data
+    environment:
+      REDIS_ANNOUNCE_IP: redis-slave-1
+    command:
+      [
+        "redis-server",
+        "--appendonly",
+        "yes",
+        "--replicaof",
+        "redis-master",
+        "6379",
+        "--repl-diskless-load",
+        "on-empty-db",
+        "--replica-announce-ip",
+        "${REDIS_ANNOUNCE_IP}",
+        "--replica-announce-port",
+        "6380",
+        "--protected-mode",
+        "no"
+      ]
+
+  sentinel-1:
+    image: redis:latest
+    container_name: sentinel-1
+    hostname: sentinel-1
+    depends_on:
+      - redis-master
+    ports:
+      - "26379:26379"
+    environment:
+      REDIS_MASTER_HOST: redis-master
+    command: >
+      sh -c 'echo "bind 0.0.0.0" > /etc/sentinel.conf &&
+            echo "sentinel resolve-hostnames yes" >> /etc/sentinel.conf &&
+            echo "sentinel monitor mymaster ${REDIS_MASTER_HOST} 6379 2" >> /etc/sentinel.conf &&
+            echo "sentinel down-after-milliseconds mymaster 10000" >> /etc/sentinel.conf &&
+            echo "sentinel failover-timeout mymaster 10000" >> /etc/sentinel.conf &&
+            echo "sentinel parallel-syncs mymaster 1" >> /etc/sentinel.conf &&
+            redis-sentinel /etc/sentinel.conf'
+
+  vote:
+    image: AWS_ACCOUNT_ID_REDACTED.dkr.ecr.us-east-1.amazonaws.com/vote-test #latest
+    depends_on: ["sentinel-1"]
+    environment: 
+      REDIS_SENTINEL_HOST: "sentinel-1"
+      REDIS_PASSWORD: "uTvLZ4udFNbUM5qE"
+      REDIS_SENTINEL_PORT: "26379"
+      REDIS_MASTER_NAME: "mymaster"
+      REDIS_USER_NAME: "default"
+    ports: ["8080:80"]
+
+  postgres:
+    image: postgres
+    hostname: postgres
+    environment: 
+      POSTGRES_PASSWORD: "dzEFikHj11kN0hxLxEZbToY9RPLdEahruUDeNhBsHWamdfOMT0uUDSEnqn89KQrm"
+      POSTGRES_USER: "db_admin"
+    ports: ["5432:5432"]
+
+  worker:
+    image: AWS_ACCOUNT_ID_REDACTED.dkr.ecr.us-east-1.amazonaws.com/worker-test #latest
+    depends_on: ["postgres", "sentinel-1"]
+    environment: 
+      DB_HOST: "postgres"
+      DB_PORT: "5432"
+      DB_USERNAME: "db_admin"
+      DB_PASSWORD: "dzEFikHj11kN0hxLxEZbToY9RPLdEahruUDeNhBsHWamdfOMT0uUDSEnqn89KQrm"
+      DB: "postgres"
+      DB_SSL_MODE: "prefer"
+      REDIS_SENTINEL_HOST: "sentinel-1"
+      REDIS_PASSWORD: "uTvLZ4udFNbUM5qE"
+      REDIS_SENTINEL_PORT: "26379"
+      REDIS_MASTER_NAME: "mymaster"
+      REDIS_USER_NAME: "default"
+
+  results:
+    image: AWS_ACCOUNT_ID_REDACTED.dkr.ecr.us-east-1.amazonaws.com/results-test #latest
+    depends_on: ["sentinel-1"]
+    environment: 
+      DB_HOST: "postgres"
+      DB_PORT: "5432"
+      DB_USERNAME: "db_admin"
+      DB_PASSWORD: "dzEFikHj11kN0hxLxEZbToY9RPLdEahruUDeNhBsHWamdfOMT0uUDSEnqn89KQrm"
+      DB: "postgres"
+      DB_SSL_MODE: "prefer"
+    ports: ["9090:80"]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  # results:
+  #   image: AWS_ACCOUNT_ID_REDACTED.dkr.ecr.us-east-1.amazonaws.com/vote-results #latest
+  #   command: echo "I'm running ${COMPOSE_PROJECT_NAME}"
+  # worker:
+  #   image: AWS_ACCOUNT_ID_REDACTED.dkr.ecr.us-east-1.amazonaws.com/vote-results #latest
+  #   command: echo "I'm running ${COMPOSE_PROJECT_NAME}"
+  #    volumes:
+  #       - type: tmpfs
+  #         target: /data
+  #         tmpfs:
+  #           size: 10g
+
+  
