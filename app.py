@@ -9,7 +9,6 @@ from time import perf_counter
 
 import redis
 import redis.exceptions
-import redis.sentinel
 import yaml
 from flask import Flask, Response, g, make_response, render_template, request
 from prometheus_client import Counter, Histogram, make_wsgi_app
