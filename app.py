@@ -8,12 +8,12 @@ from pathlib import Path
 from time import perf_counter
 
 import redis
+import redis.exceptions
+import redis.sentinel
 import yaml
 from flask import Flask, Response, g, make_response, render_template, request
-from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from prometheus_client import Counter, Histogram, make_wsgi_app
-from redis.exceptions import RedisError
-from redis.sentinel import Sentinel
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 option_a = os.getenv("OPTION_A", "Cats")
 option_b = os.getenv("OPTION_B", "Dogs")
@@ -88,9 +88,7 @@ def _record_http_metrics(response: Response) -> Response | None:
         request.url_rule.rule if request.url_rule else request.path
     )  ##Grab the route which triggered the view in the request, else get the path .. supply this later to the Histogram
     try:
-        start_time = getattr(
-            g, "request_start_time"
-        )  ##Get the request start time
+        start_time = g.request_start_time  ##Get the request start time
         REQUEST_LATENCY.labels(request.method, route).observe(
             perf_counter() - start_time
         )
@@ -137,7 +135,7 @@ def get_redis() -> redis.Redis:
         op_start = perf_counter()
         try:
             # Initialize the Sentinel client with the provided host, port, username, and password. The sentinel_kwargs are used to pass the username and password for authentication with the Redis Sentinel.
-            _sentinel_client = Sentinel(
+            _sentinel_client = redis.Sentinel(
                 [(sentinel_host.strip(), port)],
                 socket_timeout=5,
                 socket_connect_timeout=5,  ##Without this, a blocked/unreachable TCP connect can hang far longer than socket_timeout allows
@@ -146,14 +144,15 @@ def get_redis() -> redis.Redis:
                     "password": password.strip(),  ##Sentinel requires creds
                 },
             )
+            logger.info("_sentinel_client intialized")
         ##Catch all Redis Errors and create a metric based on them
-        except RedisError as e:
+        except redis.exceptions.RedisError as e:
             REDIS_ERROR_COUNT.labels(
                 e.__class__.__name__
             ).inc()  ##Increment with the exception value
             msg = f"There has been a Redis Error. Error: {e}"
             logger.critical(msg)
-            raise RedisError(msg)
+            raise redis.exceptions.RedisError(msg)
 
         finally:  ##Label a Redis latency metric and give it the value of the time it takes to intilaize the sentinel connection. Runs only if Redis except not hit.
             REDIS_OP_LATENCY.labels("sentinel_init").observe(
@@ -174,13 +173,13 @@ def get_redis() -> redis.Redis:
             protocol=2,
         )
 
-    except RedisError as e:
+    except redis.exceptions.RedisError as e:
         REDIS_ERROR_COUNT.labels(
             e.__class__.__name__
         ).inc()  ##Increment with exception value
         msg = f"There has been a Redis Error. Error: {e}"
         logger.critical(msg)
-        raise RedisError(msg)
+        raise redis.exceptions.RedisError(msg)
 
     finally:  ##How long it takes to get the master
         REDIS_OP_LATENCY.labels("sentinel_master_for").observe(
@@ -213,11 +212,11 @@ def main():
             redis_client.rpush("votes", json.dumps(vote_data))
             msg = f"Successfully sent vote for {vote} to Redis."
             logger.critical(msg)
-        except RedisError as e:
+        except redis.exceptions.RedisError as e:
             REDIS_ERROR_COUNT.labels(e.__class__.__name__).inc()
-            msg = f"Failed to submit vote to Redis. Error: {e}"
+            msg = f"Failed to submit vote to Redis. Error: {e.error_type}"
             logger.critical(msg)
-            raise RedisError(msg)
+            raise redis.exceptions.RedisError(msg)
         finally:
             REDIS_OP_LATENCY.labels("rpush_vote").observe(
                 perf_counter() - op_start
@@ -243,6 +242,6 @@ if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
         port=80,
-        debug=bool(os.getenv("FLASK_DEBUG", False)),
+        debug=bool(os.getenv("FLASK_DEBUG", "False")),
         threaded=True,  # important for handling requests concurrently.
     )
