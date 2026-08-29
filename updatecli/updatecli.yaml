@@ -1,0 +1,20 @@
+name: GitOps Image Tag updater
+# # "conditions" describe what must be true before any target is updated.
+# # Here: the matching Docker image must exist on DockerHub.
+# conditions:
+#   dockerimage:
+#     name: Is the Jenkins weekly tag published on DockerHub
+#     kind: dockerimage
+#     spec:
+#       image: jenkins/jenkins
+
+# "targets" describe what to update with the source value.
+# Here: the key "$.container.tag" of the file "data.yaml".
+targets:
+  dataFile:
+    name: Bump the Jenkins Docker image tag
+    kind: github
+    spec:
+      owner: grayburnd
+      repository: frontend-gitops
+      token: "{{ requiredEnv `GITHUB_TOKEN` }}"

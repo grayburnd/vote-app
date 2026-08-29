@@ -5,6 +5,7 @@ on:
 permissions:
   contents: read
   id-token: write
+  pull-requests: write
 env:
   AWS_REGION: us-east-1
   AWS_ACCOUNT_ID: "AWS_ACCOUNT_ID_REDACTED"
@@ -19,11 +20,23 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install Updatecli in the runner
+        uses: updatecli/updatecli-action@v3.6.0
+
       - uses: aws-actions/configure-aws-credentials@v6
         with:
           aws-region: us-east-1
           role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/gh_actions
 
+      #https://github.com/actions/create-github-app-token
+      - uses: actions/create-github-app-token@v3
+        id: app-token
+        with:
+          # required
+          client-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+##Build and Push Docker Image to ECR
       - name: Login to ECR
         run: |
           aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
@@ -35,3 +48,16 @@ jobs:
       - name: Push docker image
         run: |
           docker push ${{ env.DOCKER_IMAGE_TAG }}
+
+##Update Image Tag in Target GitOps Repo
+      - name: Run Updatecli in Dry Run mode
+        run: |
+         updatecli diff
+        env:
+          UPDATECLI_GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+
+      - name: Run Updatecli in Apply mode
+        run: |
+         updatecli apply --config updatecli/updatecli.yaml
+        env:
+          UPDATECLI_GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
