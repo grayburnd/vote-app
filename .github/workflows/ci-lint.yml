@@ -43,3 +43,7 @@ jobs:
 
       - name: Static type checks
         run: uv run mypy .
+
+      - uses: hadolint/hadolint-action@v3.5.0 ##Lint dockerfile
+        with:
+          dockerfile: Dockerfile
