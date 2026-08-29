@@ -1,0 +1,14 @@
+name: CI Pipeline
+on:
+  workflow_dispatch:
+  pull_request:
+jobs:
+  call-lint:
+    uses: grayburnd/vote-app/.github/workflows/ci-lint.yml@main
+    with:
+      uv-version: "0.12.1"
+  call-test:
+    needs: call-lint
+    uses: grayburnd/vote-app/.github/workflows/ci-test.yml@main
+    with:
+      uv-version: "0.12.1"

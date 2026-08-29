@@ -1,0 +1,27 @@
+name: CI [Test] (Callable ONLY)
+
+on:
+  workflow_call:
+    inputs:
+      uv-version:
+        required: true
+        type: string
+
+jobs:
+  ci-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Install uv
+        uses: astral-sh/setup-uv@v9.0.0
+        with:
+          # Install a specific version of uv.
+          version: ${{ inputs.uv-version }}
+          enable-cache: true
+      - name: Install dependencies with uv
+        run: uv sync --locked --all-groups ##Since UV is used as a virtual env for this
+      - name: Run pytest
+        run: |
+          uv run pytest
