@@ -1,0 +1,19 @@
+name: CD Pipeline
+on:
+  workflow_dispatch:
+  pull_request:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::AWS_ACCOUNT_ID_REDACTED:role/gh_actions
+      - name: Test AWS Creds
+        run: |
+          aws s3 ls
+          aws sts get-caller-identity
