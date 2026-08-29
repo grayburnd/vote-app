@@ -12,7 +12,7 @@ repos:
     -  id: check-case-conflict
     -  id: check-toml
     -  id: name-tests-test
-       args: [--pytest-test-first]
+       args: [--pytest-test-first] #ensure tests match test_.*\.py
 
 -   repo: https://github.com/PyCQA/isort
     rev: 8.0.1
