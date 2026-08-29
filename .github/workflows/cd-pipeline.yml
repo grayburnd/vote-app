@@ -5,6 +5,9 @@ on:
 permissions:
   contents: read
   id-token: write
+env:
+  AWS_REGION: us-east-1
+  AWS_ACCOUNT_ID: "632988741882"
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -12,8 +15,8 @@ jobs:
       - uses: aws-actions/configure-aws-credentials@v6
         with:
           aws-region: us-east-1
-          role-to-assume: arn:aws:iam::632988741882:role/gh_actions
-      - name: Test AWS Creds
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/gh_actions
+
+      - name: Login to ECR
         run: |
-          aws s3 ls
-          aws sts get-caller-identity
+          aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
