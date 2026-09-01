@@ -52,12 +52,12 @@ jobs:
 ##Update Image Tag in Target GitOps Repo
       - name: Run Updatecli in Dry Run mode
         run: |
-         updatecli diff
+         updatecli pipeline diff
         env:
           UPDATECLI_GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
       - name: Run Updatecli in Apply mode
         run: |
-         updatecli apply --config updatecli/updatecli.yaml
+         updatecli pipeline apply --config updatecli/updatecli.yaml
         env:
           UPDATECLI_GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
