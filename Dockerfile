@@ -9,6 +9,10 @@ RUN apt update && \
 # Set the application directory
 WORKDIR /usr/local/app
 
+##Create non-root user to run application from
+RUN groupadd --system appgroup && \
+    useradd --system --gid appgroup --no-create-home appuser
+
 # Install dependencies.. importantly uv lock is used as the source of truth.
 COPY pyproject.toml uv.lock .
 RUN pip install uv --no-cache-dir
@@ -21,6 +25,12 @@ FROM base AS final
 
 # Copy our code from the current folder to the working directory inside the container
 COPY . .
+
+##Ensure appuser/group owns the apps working directory
+RUN chown appuser:appgroup /usr/local/app -R
+
+##Run app as appuser
+USER appuser
 
 # Make port 80 available for links and/or publish
 EXPOSE 80

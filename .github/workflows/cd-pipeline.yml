@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create interpolated env var
-        run: echo "DOCKER_IMAGE_TAG=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.APP }}:${{ github.sha }}" >> $GITHUB_ENV
+        run: echo "DOCKER_IMAGE_TAG=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.APP }}:${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
 
       - uses: actions/checkout@v7
         with:
@@ -64,14 +64,14 @@ jobs:
       #    updatecli pipeline diff
       #   env:
       #     UPDATECLI_GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-      #     TARGET_IMAGE_TAG: ${{ github.sha }}
+      #     TARGET_IMAGE_TAG: ${{ github.event.pull_request.head.sha }}
 
       - name: Run Updatecli in Apply mode
         run: |
          updatecli pipeline apply --config updatecli/updatecli.yaml
         env:
           UPDATECLI_GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-          TARGET_IMAGE_TAG: ${{ github.sha }}
+          TARGET_IMAGE_TAG: ${{ github.event.pull_request.head.sha }}
           OWNER: ${{ github.repository_owner }}
           TARGET_REPOSITORY: "frontend-gitops"
           TARGET_BRANCH: "main"
