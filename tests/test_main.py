@@ -32,12 +32,11 @@ try:
         pull=True,
     ) as compose:
         compose.start()  ##Start env once for duration of tests
-        compose.stop()
+        print(f"{compose.get_logs()}")
 except subprocess.CalledProcessError as e:
         print(
             f"Got Docker Compose Exception: {format(e.stderr)}"
         )
-        print(f"{compose.get_logs()}")
 except Exception as e:
         print(
             f"Got Docker Compose Exception:\nError: {e}"
