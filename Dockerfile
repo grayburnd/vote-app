@@ -20,7 +20,6 @@ RUN pip install uv==0.12.1 --no-cache-dir
 
 ##Install dependencies as per uv.lock file only.
 RUN uv sync --frozen
-RUN rm pyproject.toml uv.lock
 
 # Define the final stage that will bundle the application for production
 FROM base AS final
@@ -32,7 +31,7 @@ COPY . .
 RUN chown appuser:appgroup /usr/local/app -R
 
 ##Run app as appuser
-USER appuser
+USER 999
 
 # Make port 80 available for links and/or publish
 EXPOSE 80
