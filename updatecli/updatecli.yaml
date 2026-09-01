@@ -16,7 +16,7 @@ scms:
       repository: "{{ requiredEnv `TARGET_REPOSITORY` }}"
       token: "{{ requiredEnv `UPDATECLI_GITHUB_TOKEN` }}"
       branch: "{{ requiredEnv `TARGET_BRANCH` }}"
-      workingbranchprefix: feature/image_tag/"{{ requiredEnv `TARGET_IMAGE_TAG` }}"
+      workingbranchprefix: feature/image_tag/{{ requiredEnv `TARGET_IMAGE_TAG` }}
       commitmessage:
         # produces "deps(charts): <target name>"
         type: chore
@@ -36,7 +36,7 @@ targets:
     kind: yaml
     scmid: default
     spec:
-      file: apps/"{{ requiredEnv `APP` }}"/"{{ requiredEnv `ENVIRONMENT` }}"-values.yml
+      file: apps/{{ requiredEnv `APP` }}/{{ requiredEnv `ENVIRONMENT` }}-values.yml
       key: $.image.tag
 
 actions:
