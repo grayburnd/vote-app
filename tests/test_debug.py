@@ -36,7 +36,7 @@ def docker_env():
             yield compose
             compose.stop()
     except subprocess.CalledProcessError as e:
-        raise subprocess.CalledProcessError(4,f"Got error: {e}")
+        raise subprocess.CalledProcessError(4,f"Got error: {e.stderr}")
     
 def test_vote_postgres_count():
     stdout, stderr = docker_env()
