@@ -35,7 +35,7 @@ try:
         compose.stop()
 except subprocess.CalledProcessError as e:
         print(
-            f"Got Docker Compose Exception: {e.stderr}"
+            f"Got Docker Compose Exception: {format(e.stderr)}"
         )
 except Exception as e:
         print(
