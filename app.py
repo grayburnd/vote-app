@@ -6,6 +6,7 @@ import random
 import socket
 from pathlib import Path
 from time import perf_counter
+from typing import cast
 
 import redis
 import redis.exceptions
@@ -34,7 +35,7 @@ app = Flask(__name__, static_url_path="/vote/static")
 
 ##Expose metrics endpoint so Prometheus can scrape - https://prometheus.github.io/client_python/exporting/http/flask/
 
-app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {"/metrics": make_wsgi_app()})
+app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {"/metrics": make_wsgi_app()})  # type: ignore
 
 # Initialize the sentinel client as None, so that it can be created when needed
 _sentinel_client = None
@@ -109,7 +110,7 @@ def get_redis() -> redis.Redis:
 
     # Check if the redis client is already attached to the Flask global object g, if not, create a new one. g is a special object thats unique for each request
     if hasattr(g, "redis"):
-        return g.redis
+        return cast(redis.Redis, g.redis)
 
     # Make it mandatory to have all the required environment variables set, otherwise raise a KeyError. Important - if any of these variables are missing, the application will not be able to connect to the Redis Sentinel and will fail.
     try:
@@ -186,7 +187,7 @@ def get_redis() -> redis.Redis:
         )
 
     # Return the Redis client attached to the Flask global object g. Allows redis client to be reused during request.
-    return g.redis
+    return cast(redis.Redis, g.redis)
 
 
 # Serves /vote at ALB level. This is the entrypoint for Flask.
