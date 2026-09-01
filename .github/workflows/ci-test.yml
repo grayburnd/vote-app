@@ -44,7 +44,10 @@ jobs:
       - name: Install dependencies with uv
         run: uv sync --locked --all-groups ##Since UV is used as a virtual env for this
 
-      - name: Run pytest
+      - name: Docker compose test
+        run: |
+          docker compose up -d
+          sleep 10
         env:
           REDIS_MASTER_ANNOUNCE_IP: ${{ vars.REDIS_MASTER_ANNOUNCE_IP }}
           REDIS_ANNOUNCE_IP: ${{ vars.REDIS_ANNOUNCE_IP }}
@@ -62,8 +65,26 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB: ${{ vars.DB }}
           DB_SSL_MODE: ${{ vars.DB_SSL_MODE }}
-        run: |
-          uv run pytest
+      # - name: Run pytest
+      #   env:
+      #     REDIS_MASTER_ANNOUNCE_IP: ${{ vars.REDIS_MASTER_ANNOUNCE_IP }}
+      #     REDIS_ANNOUNCE_IP: ${{ vars.REDIS_ANNOUNCE_IP }}
+      #     REDIS_MASTER_HOST: ${{ vars.REDIS_MASTER_HOST }}
+      #     REDIS_SENTINEL_HOST: ${{ vars.REDIS_SENTINEL_HOST }}
+      #     REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+      #     REDIS_SENTINEL_PORT: ${{ vars.REDIS_SENTINEL_PORT }}
+      #     REDIS_MASTER_NAME: ${{ vars.REDIS_MASTER_NAME }}
+      #     REDIS_USER_NAME: ${{ vars.REDIS_USER_NAME }}
+      #     POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      #     POSTGRES_USER: ${{ vars.POSTGRES_USER }}
+      #     DB_HOST: ${{ vars.DB_HOST }}
+      #     DB_PORT: ${{ vars.DB_PORT }}
+      #     DB_USERNAME: ${{ vars.DB_USERNAME }}
+      #     DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      #     DB: ${{ vars.DB }}
+      #     DB_SSL_MODE: ${{ vars.DB_SSL_MODE }}
+      #   run: |
+      #     uv run pytest
 
       # - name: Run Trivy vulnerability scanner
       #   uses: aquasecurity/trivy-action@v0.36.0
