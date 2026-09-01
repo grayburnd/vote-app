@@ -4,6 +4,7 @@ on:
   pull_request:
 permissions:
   pull-requests: read
+  contents: read
 jobs:
   call-lint:
     uses: grayburnd/vote-app/.github/workflows/ci-lint.yml@main
