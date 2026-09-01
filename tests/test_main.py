@@ -25,40 +25,23 @@ path = Path(__file__).parent.parent.resolve()
 if not os.getenv("GITHUB_ENV"):
     load_dotenv()
 
-try:
-    with DockerCompose(
-        path,
-        compose_file_name=["compose.yml"],
-        pull=True,
-    ) as compose:
-        compose.start()  ##Start env once for duration of tests
-        print(f"{compose.get_logs()}")
-except subprocess.CalledProcessError as e:
-        print(
-            f"Got Docker Compose Exception: {format(e.stderr)}"
-        )
-except Exception as e:
+
+# Initialize docker environment - essentially runs and maintains docker compose up.
+@pytest.fixture(scope="module")
+def docker_env():
+    try:
+        with DockerCompose(
+            path,
+            compose_file_name=["compose.yml"],
+            pull=True,
+        ) as compose:
+            compose.start()  ##Start env once for duration of tests
+            yield compose
+            compose.stop()
+    except Exception as e:
         print(
             f"Got Docker Compose Exception:\nError: {e}"
         )
-
-
-# # Initialize docker environment - essentially runs and maintains docker compose up.
-# @pytest.fixture(scope="module")
-# def docker_env():
-#     with DockerCompose(
-#         path,
-#         compose_file_name=["compose.yml"],
-#         pull=True,
-#     ) as compose:
-#         try:
-#             compose.start()  ##Start env once for duration of tests
-#             yield compose
-#             compose.stop()
-#         except Exception as e:
-#             print(
-#                 f"Got Docker Compose Exception:\nError: {e}"
-#             )
 
 
 # # Run len(vote_choice) number of tests to test the votes
