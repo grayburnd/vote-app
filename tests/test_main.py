@@ -40,6 +40,7 @@ def docker_env():
             compose.stop()
     except subprocess.CalledProcessError as e:
         print(f"Got error: {e}")
+        raise subprocess.CalledProcessError(4,f"Got error: {e}")
         yield "placeholder"
 
 # Run len(vote_choice) number of tests to test the votes
