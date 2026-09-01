@@ -8,7 +8,7 @@ permissions:
   id-token: write
 jobs:
   call-lint:
-    uses: grayburnd/vote-app/.github/workflows/ci-lint.yml@main
+    uses: ./.github/workflows/ci-lint.yml
     with:
       uv-version: "0.12.1"
   call-test:
