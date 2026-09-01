@@ -37,6 +37,7 @@ except subprocess.CalledProcessError as e:
         print(
             f"Got Docker Compose Exception: {format(e.stderr)}"
         )
+        print(f"{compose.get_logs()}")
 except Exception as e:
         print(
             f"Got Docker Compose Exception:\nError: {e}"
