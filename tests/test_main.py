@@ -25,7 +25,7 @@ if not os.getenv("GITHUB_ENV"):
     load_dotenv()
 
 
-# Initialize docker environment - essentially runs and maintains docker compose up.
+# Initialize docker environment - essentially runs and maintains docker compose up for duration of tests.
 @pytest.fixture(scope="module")
 def docker_env():
     with DockerCompose(
@@ -63,7 +63,7 @@ def test_vote_postgres_count(docker_env: DockerCompose, vote_choice: str):
             )
             response.raise_for_status()
             attempt += 1
-            time.sleep(3)
+            time.sleep(4)
     except requests.exceptions.HTTPError as e:
         raise requests.exceptions.HTTPError(
             f"failed with error code: {e.errno}\nerror: {e}"
