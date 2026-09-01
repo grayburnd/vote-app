@@ -13,6 +13,7 @@ jobs:
       uv-version: "0.12.1"
   call-test:
     needs: call-lint
+    secrets: inherit
     uses: grayburnd/vote-app/.github/workflows/ci-test.yml@main
     with:
       uv-version: "0.12.1"
