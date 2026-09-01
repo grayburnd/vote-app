@@ -1,5 +1,6 @@
 import os
 import random
+import subprocess
 import time
 from collections.abc import Callable
 from pathlib import Path
@@ -27,14 +28,19 @@ load_dotenv()
 # Initialize docker environment - essentially runs and maintains docker compose up.
 @pytest.fixture(scope="module")
 def docker_env():
-    with DockerCompose(
-        path,
-        compose_file_name=["compose.yml"],
-        pull=True,
-    ) as compose:
-        compose.start()  ##Start env once for duration of tests
-        yield compose
-        compose.stop()
+    try:
+        with DockerCompose(
+            path,
+            compose_file_name=["compose.yml"],
+            pull=True,
+        ) as compose:
+            compose.start()  ##Start env once for duration of tests
+            yield compose
+            compose.stop()
+    except subprocess.CalledProcessError as e:
+        print(
+            f"Got Docker Compose Exception:\nStderr: {e.stderr}\nStdout: {e.stdout}"
+        )
 
 
 # Run len(vote_choice) number of tests to test the votes
