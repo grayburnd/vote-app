@@ -1,0 +1,151 @@
+name: voting-app
+
+services:
+  redis-master:
+    image: redis:latest
+    container_name: redis-master
+    hostname: redis-master
+    ports:
+      - "6379:6379"
+    # volumes:
+    #   - #/tmp/redis/data/master:/data ##VOLUME:CONTAINER_PATH ##Check as do not have data already
+    environment:
+      REDIS_MASTER_ANNOUNCE_IP: ${REDIS_MASTER_ANNOUNCE_IP}
+    command:
+      [
+        "redis-server",
+        "--appendonly",
+        "yes",
+        "--repl-diskless-load",
+        "on-empty-db",
+        "--replica-announce-ip",
+        "${REDIS_MASTER_ANNOUNCE_IP}",
+        "--replica-announce-port",
+        "6379",
+        "--protected-mode",
+        "no"
+      ]
+
+  redis-slave-1:
+    image: redis:latest
+    container_name: redis-slave-1
+    hostname: redis-slave-1
+    depends_on:
+      - redis-master
+    ports:
+      - "6380:6379"
+    # volumes:
+    #   - #/tmp/redis/data/slave1:/data
+    environment:
+      REDIS_ANNOUNCE_IP: ${REDIS_ANNOUNCE_IP}
+    command:
+      [
+        "redis-server",
+        "--appendonly",
+        "yes",
+        "--replicaof",
+        "redis-master",
+        "6379",
+        "--repl-diskless-load",
+        "on-empty-db",
+        "--replica-announce-ip",
+        "${REDIS_ANNOUNCE_IP}",
+        "--replica-announce-port",
+        "6380",
+        "--protected-mode",
+        "no"
+      ]
+
+  sentinel-1:
+    image: redis:latest
+    container_name: sentinel-1
+    hostname: sentinel-1
+    depends_on:
+      - redis-master
+    ports:
+      - "26379:26379"
+    environment:
+      REDIS_MASTER_HOST: ${REDIS_MASTER_HOST}
+    command: >
+      sh -c 'echo "bind 0.0.0.0" > /etc/sentinel.conf &&
+            echo "sentinel resolve-hostnames yes" >> /etc/sentinel.conf &&
+            echo "sentinel monitor mymaster ${REDIS_MASTER_HOST} 6379 2" >> /etc/sentinel.conf &&
+            echo "sentinel down-after-milliseconds mymaster 10000" >> /etc/sentinel.conf &&
+            echo "sentinel failover-timeout mymaster 10000" >> /etc/sentinel.conf &&
+            echo "sentinel parallel-syncs mymaster 1" >> /etc/sentinel.conf &&
+            redis-sentinel /etc/sentinel.conf'
+
+  vote:
+    image: 632988741882.dkr.ecr.us-east-1.amazonaws.com/vote-test #latest
+    depends_on: ["sentinel-1"]
+    environment:
+      REDIS_SENTINEL_HOST: ${REDIS_SENTINEL_HOST}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_SENTINEL_PORT: ${REDIS_SENTINEL_PORT}
+      REDIS_MASTER_NAME: ${REDIS_MASTER_NAME}
+      REDIS_USER_NAME: ${REDIS_USER_NAME}
+    ports: ["8080:80"]
+
+  postgres:
+    image: postgres
+    hostname: postgres
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+    ports: ["5432:5432"]
+
+  worker:
+    image: 632988741882.dkr.ecr.us-east-1.amazonaws.com/worker-test #latest
+    depends_on: ["postgres", "sentinel-1"]
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB: ${DB}
+      DB_SSL_MODE: ${DB_SSL_MODE}
+      REDIS_SENTINEL_HOST: ${REDIS_SENTINEL_HOST}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_SENTINEL_PORT: ${REDIS_SENTINEL_PORT}
+      REDIS_MASTER_NAME: ${REDIS_MASTER_NAME}
+      REDIS_USER_NAME: ${REDIS_USER_NAME}
+
+  results:
+    image: 632988741882.dkr.ecr.us-east-1.amazonaws.com/results-test #latest
+    depends_on: ["sentinel-1"]
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB: ${DB}
+      DB_SSL_MODE: ${DB_SSL_MODE}
+    ports: ["9090:80"]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  # results:
+  #   image: 632988741882.dkr.ecr.us-east-1.amazonaws.com/vote-results #latest
+  #   command: echo "I'm running ${COMPOSE_PROJECT_NAME}"
+  # worker:
+  #   image: 632988741882.dkr.ecr.us-east-1.amazonaws.com/vote-results #latest
+  #   command: echo "I'm running ${COMPOSE_PROJECT_NAME}"
+  #    volumes:
+  #       - type: tmpfs
+  #         target: /data
+  #         tmpfs:
+  #           size: 10g
