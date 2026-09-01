@@ -38,9 +38,9 @@ def docker_env():
             compose.start()  ##Start env once for duration of tests
             yield compose
             compose.stop()
-        except subprocess.CalledProcessError as e:
+        except Exception as e:
             print(
-                f"Got Docker Compose Exception:\nStderr: {e.stderr}\nStdout: {e.stdout}"
+                f"Got Docker Compose Exception:\nError: {e}"
             )
 
 
