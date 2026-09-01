@@ -9,14 +9,14 @@ RUN apt-get update && \
 # Set the application directory
 WORKDIR /usr/local/app
 
+COPY pyproject.toml uv.lock ./
+
 ##Create non-root user to run application from
 # Install dependencies.. importantly uv lock is used as the source of truth.
-RUN groupadd --system appgroup && \
-    useradd --system --gid appgroup --no-create-home appuser && \
+RUN groupadd --system --gid 999 appgroup && \
+    useradd --system --gid appgroup --create-home --uid 999 appuser && \
     pip install uv==0.12.1 --no-cache-dir && \
     uv sync --frozen
-
-COPY pyproject.toml uv.lock ./
 ##param above
 
 # Define the final stage that will bundle the application for production
