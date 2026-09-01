@@ -2,6 +2,10 @@ name: CD Pipeline
 on:
   workflow_dispatch:
   pull_request:
+    branches:
+      - main
+    types:
+      - closed
 permissions:
   contents: read
   id-token: write
@@ -12,7 +16,9 @@ env:
   APP: "voting-vote"
   ENVIRONMENT: "prod"
 jobs:
+  ##Only deploy if the PR was merged to Main. Single branch only.
   deploy:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Create interpolated env var
@@ -39,18 +45,18 @@ jobs:
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
 
-# ##Build and Push Docker Image to ECR
-#       - name: Login to ECR
-#         run: |
-#           aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+##Build and Push Docker Image to ECR
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
 
-#       - name: Build and tag docker image
-#         run: |
-#           docker build . -t ${{ env.DOCKER_IMAGE_TAG }}
+      - name: Build and tag docker image
+        run: |
+          docker build . -t ${{ env.DOCKER_IMAGE_TAG }}
 
-#       - name: Push docker image
-#         run: |
-#           docker push ${{ env.DOCKER_IMAGE_TAG }}
+      - name: Push docker image
+        run: |
+          docker push ${{ env.DOCKER_IMAGE_TAG }}
 
 ##Update Image Tag in Target GitOps Repo
       # - name: Run Updatecli in Dry Run mode
