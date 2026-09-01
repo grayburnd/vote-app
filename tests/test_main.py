@@ -51,7 +51,7 @@ def test_vote_postgres_count(docker_env: DockerCompose, vote_choice: str):
     vote_data = {"vote": vote_choice}
     try:
         attempt = 0
-        limit = 2
+        limit = 5
         while attempt < limit:
             voter_id = hex(random.getrandbits(64))[2:-1]
             cookies = {"voter_id": voter_id}
@@ -63,7 +63,7 @@ def test_vote_postgres_count(docker_env: DockerCompose, vote_choice: str):
             )
             response.raise_for_status()
             attempt += 1
-            time.sleep(4)
+            time.sleep(5)
     except requests.exceptions.HTTPError as e:
         raise requests.exceptions.HTTPError(
             f"failed with error code: {e.errno}\nerror: {e}"
