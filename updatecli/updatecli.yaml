@@ -1,4 +1,12 @@
 name: GitOps Image Tag updater
+sources:
+  imageTag:
+    name: Get image tag from environment variable
+    kind: shell
+    spec:
+      command: echo $TARGET_IMAGE_TAG
+      environments:
+        - name: TARGET_IMAGE_TAG
 # # "conditions" describe what must be true before any target is updated.
 # # Here: the matching Docker image must exist on DockerHub.
 # conditions:
@@ -13,7 +21,7 @@ scms:
     spec:
       owner: grayburnd
       repository: frontend-gitops
-      token: "{{ requiredEnv `UPDATECLI_GITHUB_TOKEN` }}"
+      token: "{{ requiredEnv 'UPDATECLI_GITHUB_TOKEN' }}"
       branch: main
       commitmessage:
         # produces "deps(charts): <target name>"
