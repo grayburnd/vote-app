@@ -1,6 +1,5 @@
 import os
 import random
-import subprocess
 import time
 from collections.abc import Callable
 from pathlib import Path
@@ -37,6 +36,7 @@ def docker_env():
         compose.start()  ##Start env once for duration of tests
         yield compose
         compose.stop()
+
 
 # Run len(vote_choice) number of tests to test the votes
 @pytest.mark.parametrize("vote_choice", [("a"), ("b")])
