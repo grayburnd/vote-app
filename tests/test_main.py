@@ -25,7 +25,7 @@ if not os.getenv("GITHUB_ENV"):
     load_dotenv()
 
 
-# Initialize docker environment - essentially runs and maintains docker compose up.
+# Initialize docker environment - essentially runs and maintains docker compose up for duration of tests.
 @pytest.fixture(scope="module")
 def docker_env():
     with DockerCompose(
