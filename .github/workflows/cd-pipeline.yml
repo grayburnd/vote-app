@@ -52,12 +52,12 @@ jobs:
 #           docker push ${{ env.DOCKER_IMAGE_TAG }}
 
 ##Update Image Tag in Target GitOps Repo
-      - name: Run Updatecli in Dry Run mode
-        run: |
-         updatecli pipeline diff
-        env:
-          UPDATECLI_GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-          TARGET_IMAGE_TAG: ${{ github.sha }}
+      # - name: Run Updatecli in Dry Run mode
+      #   run: |
+      #    updatecli pipeline diff
+      #   env:
+      #     UPDATECLI_GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+      #     TARGET_IMAGE_TAG: ${{ github.sha }}
 
       - name: Run Updatecli in Apply mode
         run: |
