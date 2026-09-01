@@ -18,9 +18,11 @@ permissions:
   contents: read
 
 jobs:
-  ci-tests:
+  ci-tests-and-build:
     runs-on: ubuntu-latest
     steps:
+      - name: Create interpolated env var
+        run: echo "DOCKER_IMAGE_TAG=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.APP }}:${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
 
       - uses: actions/checkout@v7
         # with:
@@ -30,9 +32,6 @@ jobs:
         with:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/gh_actions
-
-      - name: Login to ECR
-        run: aws ecr get-login-password | docker login --username AWS --password-stdin ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
 
       - name: Install uv
         uses: astral-sh/setup-uv@v9.0.0
@@ -64,6 +63,17 @@ jobs:
           DB_SSL_MODE: ${{ vars.DB_SSL_MODE }}
         run: |
           uv run pytest
+
+      - name: Login to ECR
+        run: aws ecr get-login-password | docker login --username AWS --password-stdin ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+
+      - name: Build and tag docker image
+        run: |
+          docker build --pull --no-cache . -t ${{ env.DOCKER_IMAGE_TAG }}
+
+      - name: Push docker image
+        run: |
+          docker push ${{ env.DOCKER_IMAGE_TAG }}
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@v0.36.0
