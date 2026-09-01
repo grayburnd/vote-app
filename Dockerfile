@@ -2,8 +2,8 @@
 FROM python:3.14-slim AS base
 
 # Add curl for healthcheck
-RUN apt update && \
-    apt install -y --no-install-recommends curl && \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl && \
     rm -rf /var/lib/apt/lists/*
 
 # Set the application directory
@@ -14,7 +14,7 @@ RUN groupadd --system appgroup && \
     useradd --system --gid appgroup --no-create-home appuser
 
 # Install dependencies.. importantly uv lock is used as the source of truth.
-COPY pyproject.toml uv.lock .
+COPY pyproject.toml uv.lock ./
 RUN pip install uv --no-cache-dir
 ##Install dependencies as per uv.lock file only.
 RUN uv sync --frozen
