@@ -12,11 +12,11 @@ scms:
   default:
     kind: github
     spec:
-      owner: "{{ requiredEnv `OWNER` }}" #grayburnd
-      repository: "{{ requiredEnv `TARGET_REPOSITORY` }}" #frontend-gitops
+      owner: "{{ requiredEnv `OWNER` }}"
+      repository: "{{ requiredEnv `TARGET_REPOSITORY` }}"
       token: "{{ requiredEnv `UPDATECLI_GITHUB_TOKEN` }}"
-      branch: main
-      workingbranchprefix: feature/image_tag
+      branch: "{{ requiredEnv `TARGET_BRANCH` }}"
+      workingbranchprefix: feature/image_tag/"{{ requiredEnv `TARGET_IMAGE_TAG` }}"
       commitmessage:
         # produces "deps(charts): <target name>"
         type: chore
@@ -32,11 +32,11 @@ scms:
 # Here: the key "$.container.tag" of the file "data.yaml".
 targets:
   dataFile:
-    name: Bump the Jenkins Docker image tag
+    name: Bump the target Docker image tag
     kind: yaml
     scmid: default
     spec:
-      file: apps/voting-vote/prod-values.yml
+      file: apps/"{{ requiredEnv `APP` }}"/"{{ requiredEnv `ENVIRONMENT` }}"-values.yml
       key: $.image.tag
 
 actions:
