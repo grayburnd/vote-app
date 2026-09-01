@@ -38,8 +38,8 @@ def docker_env():
     except subprocess.CalledProcessError as e:
         raise subprocess.CalledProcessError(4,f"Got error: {e}")
     
-def test_vote_postgres_count(docker_env: DockerCompose):
-    stdout, stderr = docker_env.get_logs()
+def test_vote_postgres_count():
+    stdout, stderr = docker_env()
     if stderr:
         print(f"Errors\n:{format(stderr)}")
     else:
