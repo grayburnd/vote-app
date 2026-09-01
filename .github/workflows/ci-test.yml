@@ -84,7 +84,14 @@ jobs:
           DB: ${{ vars.DB }}
           DB_SSL_MODE: ${{ vars.DB_SSL_MODE }}
         run: |
+          docker compose -f compose.yml config
           docker compose -f compose.yml up --wait
+
+      - name: Show docker compose logs
+        if: always()
+        run: |
+          docker compose -f compose.yml ps -a
+          docker compose -f compose.yml logs --no-color
 
       # - name: Run pytest
       #   env:
