@@ -9,13 +9,14 @@ permissions:
 env:
   AWS_REGION: us-east-1
   AWS_ACCOUNT_ID: "632988741882"
-  REPOSITORY: "vote"
+  APP: "voting-vote"
+  ENVIRONMENT: "prod"
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Create interpolated env var
-        run: echo "DOCKER_IMAGE_TAG=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.REPOSITORY }}:${{ github.sha }}" >> $GITHUB_ENV
+        run: echo "DOCKER_IMAGE_TAG=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.APP }}:${{ github.sha }}" >> $GITHUB_ENV
 
       - uses: actions/checkout@v7
         with:
@@ -26,7 +27,7 @@ jobs:
 
       - uses: aws-actions/configure-aws-credentials@v6
         with:
-          aws-region: us-east-1
+          aws-region: ${{ env.AWS_REGION }}
           role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/gh_actions
 
       #https://github.com/actions/create-github-app-token
@@ -67,3 +68,6 @@ jobs:
           TARGET_IMAGE_TAG: ${{ github.sha }}
           OWNER: ${{ github.repository_owner }}
           TARGET_REPOSITORY: "frontend-gitops"
+          TARGET_BRANCH: "main"
+          ENVIRONMENT: ${{ env.ENVIRONMENT }}
+          APP: ${{ env.APP }}
