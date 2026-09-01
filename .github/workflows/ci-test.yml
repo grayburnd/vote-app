@@ -6,22 +6,40 @@ on:
       uv-version:
         required: true
         type: string
+env:
+  AWS_REGION: us-east-1
+  AWS_ACCOUNT_ID: "AWS_ACCOUNT_ID_REDACTED"
 
 jobs:
   ci-tests:
     runs-on: ubuntu-latest
     steps:
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/gh_actions
+
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
+
       - name: Install uv
         uses: astral-sh/setup-uv@v9.0.0
         with:
           # Install a specific version of uv.
           version: ${{ inputs.uv-version }}
           enable-cache: true
+
       - name: Install dependencies with uv
         run: uv sync --locked --all-groups ##Since UV is used as a virtual env for this
+
       - name: Run pytest
         run: |
           uv run pytest
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: 'aws_account_id.dkr.ecr.region.amazonaws.com/imageName:${{ github.sha }}'
+          format: 'sarif'
+          output: 'trivy-results.sarif'

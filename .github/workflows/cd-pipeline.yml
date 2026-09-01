@@ -52,7 +52,7 @@ jobs:
 
       - name: Build and tag docker image
         run: |
-          docker build . -t ${{ env.DOCKER_IMAGE_TAG }}
+          docker build --pull --no-cache . -t ${{ env.DOCKER_IMAGE_TAG }}
 
       - name: Push docker image
         run: |
