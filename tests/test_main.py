@@ -30,7 +30,7 @@ def docker_env():
     with DockerCompose(
         path,
         compose_file_name=["compose.yml"],
-        pull=False,  ##Set pull to False to use local images, may need to change in GH Actions
+        pull=True,
     ) as compose:
         compose.start()  ##Start env once for duration of tests
         yield compose
