@@ -63,7 +63,7 @@ def test_vote_postgres_count(docker_env: DockerCompose, vote_choice: str):
             )
             response.raise_for_status()
             attempt += 1
-            time.sleep(3)
+            time.sleep(4)
     except requests.exceptions.HTTPError as e:
         raise requests.exceptions.HTTPError(
             f"failed with error code: {e.errno}\nerror: {e}"
