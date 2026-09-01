@@ -131,20 +131,20 @@ def docker_env():
 #             target_func()
 
 
-# def test_rpush_raises(mocker: pytest_mock.MockerFixture):
-#     # - Need to see cos the env vars aren't getting used inside the container, its the context of my shell instead i.e REDIS_SENTINEL_HOST
-#     flask_app = Flask(__name__, root_path=str(path))
-#     with flask_app.test_request_context(
-#         "/vote", method="POST", data={"vote": "a"}
-#     ):
-#         mocker.patch(
-#             "redis.Redis.rpush",
-#             side_effect=redis.exceptions.RedisError(
-#                 "There has been a Redis Error"
-#             ),
-#         )
-#         with pytest.raises(redis.RedisError):
-#             main()
+def test_rpush_raises(mocker: pytest_mock.MockerFixture):
+    # - Need to see cos the env vars aren't getting used inside the container, its the context of my shell instead i.e REDIS_SENTINEL_HOST
+    flask_app = Flask(__name__, root_path=str(path))
+    with flask_app.test_request_context(
+        "/vote", method="POST", data={"vote": "a"}
+    ):
+        mocker.patch(
+            "redis.Redis.rpush",
+            side_effect=redis.exceptions.RedisError(
+                "There has been a Redis Error"
+            ),
+        )
+        with pytest.raises(redis.RedisError):
+            main()
 
 
 # # TODO
