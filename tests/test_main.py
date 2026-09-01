@@ -57,7 +57,9 @@ def test_vote_postgres_count(docker_env: DockerCompose, vote_choice: str):
             print(
                 f"Attempt {attempt}, sending vote with voter_id {voter_id}..."
             )
-            response = requests.post(url, data=vote_data, cookies=cookies)
+            response = requests.post(
+                url, data=vote_data, cookies=cookies, timeout=15
+            )
             response.raise_for_status()
             attempt += 1
             time.sleep(3)
