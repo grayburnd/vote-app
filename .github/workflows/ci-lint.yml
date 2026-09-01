@@ -26,7 +26,7 @@ jobs:
           enable-cache: true
 
       - name: Install dependencies with uv
-        run: uv sync --locked --all-extras --dev ##Since UV is used as a virtual env for this
+        run: uv sync --locked --all-groups ##Since UV is used as a virtual env for this
 
       - name: Format checks
         run: uv run black --check .
