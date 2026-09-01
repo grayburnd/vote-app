@@ -36,6 +36,7 @@ jobs:
           # required
           client-id: ${{ vars.APP_CLIENT_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
 
 # ##Build and Push Docker Image to ECR
 #       - name: Login to ECR
