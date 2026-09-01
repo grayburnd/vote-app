@@ -1,14 +1,17 @@
 name: CI [Test] (Callable ONLY)
 
 on:
+
   workflow_call:
     inputs:
       uv-version:
         required: true
         type: string
+
 env:
   AWS_REGION: us-east-1
   AWS_ACCOUNT_ID: "632988741882"
+  APP: "voting-vote"
 
 jobs:
   ci-tests:
@@ -40,6 +43,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: 'aws_account_id.dkr.ecr.region.amazonaws.com/imageName:${{ github.sha }}'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
+          image-ref: '${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.APP }}:${{ github.event.pull_request.head.sha }}'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
