@@ -21,7 +21,7 @@ scms:
     spec:
       owner: grayburnd
       repository: frontend-gitops
-      token: "{{ requiredEnv \"UPDATECLI_GITHUB_TOKEN\" }}"
+      token: "{{ requiredEnv `UPDATECLI_GITHUB_TOKEN` }}"
       branch: main
       commitmessage:
         # produces "deps(charts): <target name>"
