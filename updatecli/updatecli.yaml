@@ -1,4 +1,4 @@
-name: GitOps Image Tag updater
+name: GitOps Image Tag updater ##Parameterise this next.
 sources:
   imageTag:
     name: Get image tag from environment variable
@@ -12,8 +12,8 @@ scms:
   default:
     kind: github
     spec:
-      owner: grayburnd
-      repository: frontend-gitops
+      owner: $OWNER #grayburnd
+      repository: $TARGET_REPOSITORY #frontend-gitops
       token: "{{ requiredEnv `UPDATECLI_GITHUB_TOKEN` }}"
       branch: main
       workingbranchprefix: feature/image_tag

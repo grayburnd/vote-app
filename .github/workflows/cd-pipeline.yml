@@ -65,3 +65,5 @@ jobs:
         env:
           UPDATECLI_GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           TARGET_IMAGE_TAG: ${{ github.sha }}
+          OWNER: ${{ github.repository_owner }}
+          TARGET_REPOSITORY: "frontend-gitops"
