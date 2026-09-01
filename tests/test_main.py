@@ -22,7 +22,8 @@ from app import get_redis, main
 path = Path(__file__).parent.parent.resolve()
 
 # Initialize env vars into run context
-load_dotenv()
+if not os.getenv("GITHUB_ENV"):
+    load_dotenv()
 
 
 # Initialize docker environment - essentially runs and maintains docker compose up.
