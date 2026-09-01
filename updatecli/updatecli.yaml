@@ -12,8 +12,8 @@ scms:
   default:
     kind: github
     spec:
-      owner: $OWNER #grayburnd
-      repository: $TARGET_REPOSITORY #frontend-gitops
+      owner: "{{ requiredEnv `OWNER` }}" #grayburnd
+      repository: "{{ requiredEnv `TARGET_REPOSITORY` }}" #frontend-gitops
       token: "{{ requiredEnv `UPDATECLI_GITHUB_TOKEN` }}"
       branch: main
       workingbranchprefix: feature/image_tag
