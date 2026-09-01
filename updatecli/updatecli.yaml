@@ -23,6 +23,7 @@ scms:
       repository: frontend-gitops
       token: "{{ requiredEnv `UPDATECLI_GITHUB_TOKEN` }}"
       branch: main
+      workingbranchprefix: feature/updatecli
       commitmessage:
         # produces "deps(charts): <target name>"
         type: chore
@@ -44,3 +45,11 @@ targets:
     spec:
       file: apps/voting-vote/prod-values.yml
       key: $.image.tag
+
+actions:
+  default:
+    kind: github/pullrequest
+    scmid: default
+    spec:
+      title: "chore(image_tag): update voting-vote image tag"
+      description: "Automated PR to update the Jenkins Docker image tag."
