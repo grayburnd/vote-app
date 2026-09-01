@@ -13,10 +13,14 @@ COPY pyproject.toml uv.lock ./
 
 ##Create non-root user to run application from
 # Install dependencies.. importantly uv lock is used as the source of truth.
+# pip/setuptools are only needed to bootstrap uv, and their vendored deps
+# (e.g. pip's bundled msgpack) aren't used once uv sync has run, so remove
+# them to shrink the image's vulnerability surface.
 RUN groupadd --system --gid 999 appgroup && \
     useradd --system --gid appgroup --create-home --uid 999 appuser && \
     pip install uv==0.12.1 --no-cache-dir && \
-    uv sync --frozen
+    uv sync --frozen && \
+    pip uninstall -y pip setuptools wheel
 ##param above
 
 # Define the final stage that will bundle the application for production
