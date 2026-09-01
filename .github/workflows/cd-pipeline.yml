@@ -36,18 +36,18 @@ jobs:
           client-id: ${{ vars.APP_CLIENT_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
-##Build and Push Docker Image to ECR
-      - name: Login to ECR
-        run: |
-          aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+# ##Build and Push Docker Image to ECR
+#       - name: Login to ECR
+#         run: |
+#           aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
 
-      - name: Build and tag docker image
-        run: |
-          docker build . -t ${{ env.DOCKER_IMAGE_TAG }}
+#       - name: Build and tag docker image
+#         run: |
+#           docker build . -t ${{ env.DOCKER_IMAGE_TAG }}
 
-      - name: Push docker image
-        run: |
-          docker push ${{ env.DOCKER_IMAGE_TAG }}
+#       - name: Push docker image
+#         run: |
+#           docker push ${{ env.DOCKER_IMAGE_TAG }}
 
 ##Update Image Tag in Target GitOps Repo
       - name: Run Updatecli in Dry Run mode
