@@ -65,6 +65,10 @@ jobs:
       #     DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       #     DB: ${{ vars.DB }}
       #     DB_SSL_MODE: ${{ vars.DB_SSL_MODE }}
+      - name: Explore directory contents
+        run: |
+          pwd
+          ls 
       - name: Run pytest
         env:
           REDIS_MASTER_ANNOUNCE_IP: ${{ vars.REDIS_MASTER_ANNOUNCE_IP }}
