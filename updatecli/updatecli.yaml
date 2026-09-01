@@ -7,14 +7,7 @@ sources:
       command: echo $TARGET_IMAGE_TAG
       environments:
         - name: TARGET_IMAGE_TAG
-# # "conditions" describe what must be true before any target is updated.
-# # Here: the matching Docker image must exist on DockerHub.
-# conditions:
-#   dockerimage:
-#     name: Is the Jenkins weekly tag published on DockerHub
-#     kind: dockerimage
-#     spec:
-#       image: jenkins/jenkins
+
 scms:
   default:
     kind: github
@@ -23,7 +16,7 @@ scms:
       repository: frontend-gitops
       token: "{{ requiredEnv `UPDATECLI_GITHUB_TOKEN` }}"
       branch: main
-      workingbranchprefix: feature/updatecli
+      workingbranchprefix: feature/image_tag
       commitmessage:
         # produces "deps(charts): <target name>"
         type: chore
