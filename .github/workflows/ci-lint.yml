@@ -18,32 +18,32 @@ jobs:
         with:
           fetch-depth: 0
 
-      # - name: Install uv
-      #   uses: astral-sh/setup-uv@v9.0.0
-      #   with:
-      #     # Install a specific version of uv.
-      #     version: ${{ inputs.uv-version }}
-      #     enable-cache: true
+      - name: Install uv
+        uses: astral-sh/setup-uv@v9.0.0
+        with:
+          # Install a specific version of uv.
+          version: ${{ inputs.uv-version }}
+          enable-cache: true
 
-      # - name: Install dependencies with uv
-      #   run: uv sync --locked --all-groups ##Since UV is used as a virtual env for this
+      - name: Install dependencies with uv
+        run: uv sync --locked --all-groups ##Since UV is used as a virtual env for this
 
-      # - name: Format checks
-      #   run: uv run black --check .
+      - name: Format checks
+        run: uv run black --check .
 
-      # - name: Linting checks
-      #   run: uv run ruff check .
+      - name: Linting checks
+        run: uv run ruff check .
 
-      # - name: Security checks
-      #   run: uv run bandit -c pyproject.toml -r -lll . ##Only return non-zero exit code for high and above findings, no config file equivalent
+      - name: Security checks
+        run: uv run bandit -c pyproject.toml -r -lll . ##Only return non-zero exit code for high and above findings, no config file equivalent
 
-      # - uses: gitleaks/gitleaks-action@v3
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Static type checks
-      #   run: uv run mypy .
+      - name: Static type checks
+        run: uv run mypy .
 
-      # - uses: hadolint/hadolint-action@v3.5.0 ##Lint dockerfile
-      #   with:
-      #     dockerfile: Dockerfile
+      - uses: hadolint/hadolint-action@v3.5.0 ##Lint dockerfile
+        with:
+          dockerfile: Dockerfile
