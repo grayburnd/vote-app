@@ -76,7 +76,7 @@ services:
             redis-sentinel /etc/sentinel.conf'
 
   vote:
-    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${APP}:${DOCKER_IMAGE_TAG}
+    image: ${DOCKER_IMAGE_TAG}
     depends_on: ["sentinel-1"]
     environment:
       REDIS_SENTINEL_HOST: ${REDIS_SENTINEL_HOST}
