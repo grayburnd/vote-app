@@ -19,7 +19,7 @@ option_a = os.getenv("OPTION_A", "Cats")
 option_b = os.getenv("OPTION_B", "Dogs")
 hostname = socket.gethostname()
 
-##Logging intialization
+##Logging intialization.
 log_level = os.getenv("LOG_LEVEL", "DEBUG")
 config_path = (
     Path(__file__).parent / "logging/declarative-config.yaml"
