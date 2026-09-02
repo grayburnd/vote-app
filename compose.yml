@@ -77,6 +77,7 @@ services:
 
   vote:
     image: ${DOCKER_IMAGE_TAG}
+    # pull_policy: missing ##Default
     depends_on: ["sentinel-1"]
     environment:
       REDIS_SENTINEL_HOST: ${REDIS_SENTINEL_HOST}
@@ -96,6 +97,7 @@ services:
 
   worker:
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/voting-worker:${VOTING_WORKER_LATEST_IMAGE_TAG}
+    # pull_policy: missing ##Default
     depends_on: ["postgres", "sentinel-1"]
     environment:
       DB_HOST: ${DB_HOST}
@@ -112,6 +114,7 @@ services:
 
   results:
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/voting-results:${VOTING_RESULTS_LATEST_IMAGE_TAG}
+    # pull_policy: missing ##Default
     depends_on: ["sentinel-1"]
     environment:
       DB_HOST: ${DB_HOST}
