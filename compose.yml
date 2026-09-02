@@ -76,7 +76,7 @@ services:
             redis-sentinel /etc/sentinel.conf'
 
   vote:
-    image: 632988741882.dkr.ecr.us-east-1.amazonaws.com/vote-test #latest
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${APP}:${DOCKER_IMAGE_TAG}
     depends_on: ["sentinel-1"]
     environment:
       REDIS_SENTINEL_HOST: ${REDIS_SENTINEL_HOST}
@@ -95,7 +95,7 @@ services:
     ports: ["5432:5432"]
 
   worker:
-    image: 632988741882.dkr.ecr.us-east-1.amazonaws.com/worker-test #latest
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/voting-worker:${VOTING_WORKER_LATEST_IMAGE_TAG}
     depends_on: ["postgres", "sentinel-1"]
     environment:
       DB_HOST: ${DB_HOST}
@@ -111,7 +111,7 @@ services:
       REDIS_USER_NAME: ${REDIS_USER_NAME}
 
   results:
-    image: 632988741882.dkr.ecr.us-east-1.amazonaws.com/results-test #latest
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/voting-results:${VOTING_RESULTS_LATEST_IMAGE_TAG}
     depends_on: ["sentinel-1"]
     environment:
       DB_HOST: ${DB_HOST}
