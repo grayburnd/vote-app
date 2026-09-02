@@ -89,33 +89,33 @@ jobs:
       # - name: Get docker compose logs
       #   run: |
       #     docker compose logs
-      - name: show compose contents
-        run: cat compose.yml
+      # - name: show compose contents
+      #   run: cat compose.yml
 ##DEBUG ONLY
 
-      # - name: Run pytest
-      #   env:
-      #     REDIS_MASTER_ANNOUNCE_IP: ${{ vars.REDIS_MASTER_ANNOUNCE_IP }}
-      #     REDIS_ANNOUNCE_IP: ${{ vars.REDIS_ANNOUNCE_IP }}
-      #     REDIS_MASTER_HOST: ${{ vars.REDIS_MASTER_HOST }}
-      #     REDIS_SENTINEL_HOST: ${{ vars.REDIS_SENTINEL_HOST }}
-      #     REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
-      #     REDIS_SENTINEL_PORT: ${{ vars.REDIS_SENTINEL_PORT }}
-      #     REDIS_MASTER_NAME: ${{ vars.REDIS_MASTER_NAME }}
-      #     REDIS_USER_NAME: ${{ vars.REDIS_USER_NAME }}
-      #     POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      #     POSTGRES_USER: ${{ vars.POSTGRES_USER }}
-      #     DB_HOST: ${{ vars.DB_HOST }}
-      #     DB_PORT: ${{ vars.DB_PORT }}
-      #     DB_USERNAME: ${{ vars.DB_USERNAME }}
-      #     DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      #     DB: ${{ vars.DB }}
-      #     DB_SSL_MODE: ${{ vars.DB_SSL_MODE }}
-      #     DOCKER_IMAGE_TAG: ${{ env.DOCKER_IMAGE_TAG }}
-      #     VOTING_RESULTS_LATEST_IMAGE_TAG: ${{ env.VOTING_RESULTS_LATEST_IMAGE_TAG }}
-      #     VOTING_WORKER_LATEST_IMAGE_TAG: ${{ env.VOTING_WORKER_LATEST_IMAGE_TAG }}
-      #   run: |
-      #     uv run pytest
+      - name: Run pytest
+        env:
+          REDIS_MASTER_ANNOUNCE_IP: ${{ vars.REDIS_MASTER_ANNOUNCE_IP }}
+          REDIS_ANNOUNCE_IP: ${{ vars.REDIS_ANNOUNCE_IP }}
+          REDIS_MASTER_HOST: ${{ vars.REDIS_MASTER_HOST }}
+          REDIS_SENTINEL_HOST: ${{ vars.REDIS_SENTINEL_HOST }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          REDIS_SENTINEL_PORT: ${{ vars.REDIS_SENTINEL_PORT }}
+          REDIS_MASTER_NAME: ${{ vars.REDIS_MASTER_NAME }}
+          REDIS_USER_NAME: ${{ vars.REDIS_USER_NAME }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_USER: ${{ vars.POSTGRES_USER }}
+          DB_HOST: ${{ vars.DB_HOST }}
+          DB_PORT: ${{ vars.DB_PORT }}
+          DB_USERNAME: ${{ vars.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB: ${{ vars.DB }}
+          DB_SSL_MODE: ${{ vars.DB_SSL_MODE }}
+          DOCKER_IMAGE_TAG: ${{ env.DOCKER_IMAGE_TAG }}
+          VOTING_RESULTS_LATEST_IMAGE_TAG: ${{ env.VOTING_RESULTS_LATEST_IMAGE_TAG }}
+          VOTING_WORKER_LATEST_IMAGE_TAG: ${{ env.VOTING_WORKER_LATEST_IMAGE_TAG }}
+        run: |
+          uv run pytest
 
       # - name: Push docker image
       #   run: |
