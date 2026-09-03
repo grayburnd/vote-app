@@ -42,4 +42,5 @@ EXPOSE 80
 ENTRYPOINT ["uv"]
 
 ##No sync used to ensure that it uses the existing .venv and doesnt install dependencies at runtime
-CMD ["run", "--no-sync", "gunicorn", "--bind", "0.0.0.0:80", "--workers", "2", "--threads", "2", "app:app"]
+##Single worker so in-process Prometheus counters aren't split across processes (avoids needing multiprocess mode)
+CMD ["run", "--no-sync", "gunicorn", "--bind", "0.0.0.0:80", "--workers", "1", "--threads", "2", "app:app"]
