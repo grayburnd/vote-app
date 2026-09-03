@@ -19,7 +19,7 @@ option_a = os.getenv("OPTION_A", "Cats")
 option_b = os.getenv("OPTION_B", "Dogs")
 hostname = socket.gethostname()
 
-##Logging intialization
+##Logging intialization.
 log_level = os.getenv("LOG_LEVEL", "DEBUG")
 config_path = (
     Path(__file__).parent / "logging/declarative-config.yaml"
@@ -196,14 +196,22 @@ def main():
     # Grab the redis client from the Flask global object g. If it doesn't exist, create a new one.
     redis_client = get_redis()
     voter_id: str | None = request.cookies.get("voter_id")
+    existing_voter_id = (
+        False  # Initialize so the logged vote is not duplicated.
+    )
     if not voter_id:
         voter_id = hex(random.getrandbits(64))[2:-1]  ##Generate random voter ID
+        logger.info("Voter ID is non-existent for this user, hence setting...")
+
+    else:
+        existing_voter_id = True
+
+    logger.info(f"Voter ID is {voter_id}")
 
     if request.method == "POST":
         # Grab the vote from the form data included in index.html and passed through as a Post request by the user.
         vote = request.form["vote"]
         logger.info(f"Received vote for {vote}. Submitting to Redis...")
-        logger.info(f"Voter ID is {voter_id}")
         vote_data = {"voter_id": voter_id, "vote": vote}
 
         # Use rpush to push data to redis to append votes to a list so the order is kept.
@@ -211,13 +219,16 @@ def main():
         try:
             redis_client.rpush("votes", json.dumps(vote_data))
             msg = f"Successfully sent vote for {vote} to Redis."
-            logger.critical(msg)
+            logger.info(msg)
         except redis.exceptions.RedisError as e:
             REDIS_ERROR_COUNT.labels(e.__class__.__name__).inc()
             msg = f"Failed to submit vote to Redis. Error: {e.error_type}"
             logger.critical(msg)
             raise redis.exceptions.RedisError(msg)
-        finally:
+        if not existing_voter_id:
+            msg = f"Logging vote: {vote} for unique voter_id: {voter_id} to Redis."
+            logger.info(msg)
+            # We only log counting votes which is one per voting_id
             REDIS_OP_LATENCY.labels("rpush_vote").observe(
                 perf_counter() - op_start
             )

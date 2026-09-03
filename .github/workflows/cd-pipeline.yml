@@ -46,14 +46,6 @@ jobs:
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
 
-##Update Image Tag in Target GitOps Repo
-      # - name: Run Updatecli in Dry Run mode
-      #   run: |
-      #    updatecli pipeline diff
-      #   env:
-      #     UPDATECLI_GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-      #     TARGET_IMAGE_TAG: ${{ github.event.pull_request.head.sha }}
-
       - name: Run Updatecli in Apply mode
         run: |
          updatecli pipeline apply --config updatecli/updatecli.yaml
