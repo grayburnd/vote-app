@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 from flask import Flask
 from testcontainers.compose import DockerCompose
 
-from app import get_redis, main
+from src.app import get_redis, main
 
 # Initialize Root path
 path = Path(__file__).parent.parent.resolve()

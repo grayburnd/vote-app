@@ -124,31 +124,3 @@ services:
       DB: ${DB}
       DB_SSL_MODE: ${DB_SSL_MODE}
     ports: ["9090:80"]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  # results:
-  #   image: 632988741882.dkr.ecr.us-east-1.amazonaws.com/vote-results #latest
-  #   command: echo "I'm running ${COMPOSE_PROJECT_NAME}"
-  # worker:
-  #   image: 632988741882.dkr.ecr.us-east-1.amazonaws.com/vote-results #latest
-  #   command: echo "I'm running ${COMPOSE_PROJECT_NAME}"
-  #    volumes:
-  #       - type: tmpfs
-  #         target: /data
-  #         tmpfs:
-  #           size: 10g
