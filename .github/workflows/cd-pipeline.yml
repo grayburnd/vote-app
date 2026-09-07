@@ -15,17 +15,15 @@ env:
   AWS_ACCOUNT_ID: "AWS_ACCOUNT_ID_REDACTED"
   APP: "voting-vote"
   ENVIRONMENT: "prod"
+  OIDC_ROLE_NAME: "gh_actions"
 jobs:
   ##Only deploy if the PR was merged to Main. Single branch only.
   deploy:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-
-      - name: Create interpolated env var
-        run: echo "DOCKER_IMAGE_TAG=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.APP }}:${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
-
-      - uses: actions/checkout@v7
+      - name: Checkout local Git Repo
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -35,7 +33,7 @@ jobs:
       - uses: aws-actions/configure-aws-credentials@v6
         with:
           aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/gh_actions
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.OIDC_ROLE_NAME }}
 
       #https://github.com/actions/create-github-app-token
       - uses: actions/create-github-app-token@v3
