@@ -76,7 +76,7 @@ services:
             redis-sentinel /etc/sentinel.conf'
 
   vote:
-    image: ${DOCKER_IMAGE_TAG}
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/voting-vote:${DOCKER_IMAGE_TAG}
     # pull_policy: missing ##Default
     depends_on: ["sentinel-1"]
     environment:
