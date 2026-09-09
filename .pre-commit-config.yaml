@@ -46,7 +46,7 @@ repos:
   hooks:
     - id: bandit
       name: bandit
-      entry: uv run bandit -c pyproject.toml -r -lll .
+      entry: uv run bandit -c pyproject.toml -r -lll . ##Only report the highest levels
       language: system
       types: [python]
       pass_filenames: false

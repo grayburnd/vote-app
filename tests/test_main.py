@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 from flask import Flask
 from testcontainers.compose import DockerCompose
 
-from app import get_redis, main
+from src.app import get_redis, main
 
 # Initialize Root path
 path = Path(__file__).parent.parent.resolve()
@@ -33,7 +33,6 @@ def docker_env():
         compose_file_name=["compose.yml"],
         pull=False,
     ) as compose:
-        compose.start()  ##Start env once for duration of tests
         yield compose
         compose.stop()
 

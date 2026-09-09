@@ -76,7 +76,7 @@ services:
             redis-sentinel /etc/sentinel.conf'
 
   vote:
-    image: ${DOCKER_IMAGE_TAG}
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/voting-vote:${DOCKER_IMAGE_TAG}
     # pull_policy: missing ##Default
     depends_on: ["sentinel-1"]
     environment:
@@ -124,31 +124,3 @@ services:
       DB: ${DB}
       DB_SSL_MODE: ${DB_SSL_MODE}
     ports: ["9090:80"]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  # results:
-  #   image: AWS_ACCOUNT_ID_REDACTED.dkr.ecr.us-east-1.amazonaws.com/vote-results #latest
-  #   command: echo "I'm running ${COMPOSE_PROJECT_NAME}"
-  # worker:
-  #   image: AWS_ACCOUNT_ID_REDACTED.dkr.ecr.us-east-1.amazonaws.com/vote-results #latest
-  #   command: echo "I'm running ${COMPOSE_PROJECT_NAME}"
-  #    volumes:
-  #       - type: tmpfs
-  #         target: /data
-  #         tmpfs:
-  #           size: 10g
