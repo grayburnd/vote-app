@@ -22,7 +22,7 @@ hostname = socket.gethostname()
 ##Logging intialization.
 log_level = os.getenv("LOG_LEVEL", "DEBUG")
 config_path = (
-    Path(__file__).parent / "logging/declarative-config.yaml"
+    Path(__file__).parent.parent / "logging/declarative-config.yaml"
 ).resolve()
 with open(config_path, "r") as config_file:
     yaml_config = yaml.safe_load(config_file)
