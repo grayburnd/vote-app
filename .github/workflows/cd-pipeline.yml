@@ -46,7 +46,8 @@ jobs:
           UPDATECLI_GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           TARGET_IMAGE_TAG: ${{ github.event.pull_request.head.sha }}
           OWNER: ${{ github.repository_owner }}
-          TARGET_REPOSITORY: "frontend-gitops"
+          TARGET_REPOSITORY: "private-gitops-values"
           TARGET_BRANCH: "main"
           ENVIRONMENT: ${{ vars.ENVIRONMENT }}
           APP: ${{ vars.APP }}
+          TEAM: ${{ vars.TEAM }}
