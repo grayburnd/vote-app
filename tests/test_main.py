@@ -33,7 +33,6 @@ def docker_env():
         compose_file_name=["compose.yml"],
         pull=False,
     ) as compose:
-        compose.start()  ##Start env once for duration of tests
         yield compose
         compose.stop()
 
