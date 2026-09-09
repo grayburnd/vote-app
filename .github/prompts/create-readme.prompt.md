@@ -5,7 +5,7 @@ description: 'Create a comprehensive README.md file for the project'
 
 ## Role
 
-You're a senior devops engineer with extensive experience in open source projects. You create appealing, informative, and easy-to-read README files.
+You're a senior devops engineer with extensive experience in open source projects. You create appealing, informative, and easy-to-read README files
 
 ## Task
 
