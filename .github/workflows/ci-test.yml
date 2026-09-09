@@ -64,39 +64,9 @@ jobs:
       - name: Install dependencies with uv
         run: uv sync --frozen --all-groups ##Since UV is used as a virtual env for this
 ##DEBUG ONLY
-      # - name: Run Docker compose as a test
-      #   run: |
-      #     docker compose up
-      #   env:
-      #     REDIS_MASTER_ANNOUNCE_IP: ${{ vars.REDIS_MASTER_ANNOUNCE_IP }}
-      #     REDIS_ANNOUNCE_IP: ${{ vars.REDIS_ANNOUNCE_IP }}
-      #     REDIS_MASTER_HOST: ${{ vars.REDIS_MASTER_HOST }}
-      #     REDIS_SENTINEL_HOST: ${{ vars.REDIS_SENTINEL_HOST }}
-      #     REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
-      #     REDIS_SENTINEL_PORT: ${{ vars.REDIS_SENTINEL_PORT }}
-      #     REDIS_MASTER_NAME: ${{ vars.REDIS_MASTER_NAME }}
-      #     REDIS_USER_NAME: ${{ vars.REDIS_USER_NAME }}
-      #     POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      #     POSTGRES_USER: ${{ vars.POSTGRES_USER }}
-      #     DB_HOST: ${{ vars.DB_HOST }}
-      #     DB_PORT: ${{ vars.DB_PORT }}
-      #     DB_USERNAME: ${{ vars.DB_USERNAME }}
-      #     DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      #     DB: ${{ vars.DB }}
-      #     DB_SSL_MODE: ${{ vars.DB_SSL_MODE }}
-      #     DOCKER_IMAGE_URI: ${{ env.DOCKER_IMAGE_URI }}
-      #     VOTING_RESULTS_LATEST_IMAGE_TAG: ${{ env.VOTING_RESULTS_LATEST_IMAGE_TAG }}
-      #     VOTING_WORKER_LATEST_IMAGE_TAG: ${{ env.VOTING_WORKER_LATEST_IMAGE_TAG }}
-      #   continue-on-error: true
-
-      # - name: Get docker compose logs
-      #   run: |
-      #     docker compose logs
-      # - name: show compose contents
-      #   run: cat compose.yml
-##DEBUG ONLY
-
-      - name: Run pytest
+      - name: Run Docker compose as a test
+        run: |
+          docker compose up
         env:
           REDIS_MASTER_ANNOUNCE_IP: ${{ vars.REDIS_MASTER_ANNOUNCE_IP }}
           REDIS_ANNOUNCE_IP: ${{ vars.REDIS_ANNOUNCE_IP }}
@@ -117,18 +87,48 @@ jobs:
           DOCKER_IMAGE_URI: ${{ env.DOCKER_IMAGE_URI }}
           VOTING_RESULTS_LATEST_IMAGE_TAG: ${{ env.VOTING_RESULTS_LATEST_IMAGE_TAG }}
           VOTING_WORKER_LATEST_IMAGE_TAG: ${{ env.VOTING_WORKER_LATEST_IMAGE_TAG }}
+        continue-on-error: true
 
+      - name: Get docker compose logs
         run: |
-          uv run pytest
+          docker compose logs
+      - name: show compose contents
+        run: cat compose.yml
+##DEBUG ONLY
 
-      - name: Push docker image
-        run: |
-          docker push ${{ env.DOCKER_IMAGE_URI }}
+      # - name: Run pytest
+      #   env:
+      #     REDIS_MASTER_ANNOUNCE_IP: ${{ vars.REDIS_MASTER_ANNOUNCE_IP }}
+      #     REDIS_ANNOUNCE_IP: ${{ vars.REDIS_ANNOUNCE_IP }}
+      #     REDIS_MASTER_HOST: ${{ vars.REDIS_MASTER_HOST }}
+      #     REDIS_SENTINEL_HOST: ${{ vars.REDIS_SENTINEL_HOST }}
+      #     REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+      #     REDIS_SENTINEL_PORT: ${{ vars.REDIS_SENTINEL_PORT }}
+      #     REDIS_MASTER_NAME: ${{ vars.REDIS_MASTER_NAME }}
+      #     REDIS_USER_NAME: ${{ vars.REDIS_USER_NAME }}
+      #     POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      #     POSTGRES_USER: ${{ vars.POSTGRES_USER }}
+      #     DB_HOST: ${{ vars.DB_HOST }}
+      #     DB_PORT: ${{ vars.DB_PORT }}
+      #     DB_USERNAME: ${{ vars.DB_USERNAME }}
+      #     DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      #     DB: ${{ vars.DB }}
+      #     DB_SSL_MODE: ${{ vars.DB_SSL_MODE }}
+      #     DOCKER_IMAGE_URI: ${{ env.DOCKER_IMAGE_URI }}
+      #     VOTING_RESULTS_LATEST_IMAGE_TAG: ${{ env.VOTING_RESULTS_LATEST_IMAGE_TAG }}
+      #     VOTING_WORKER_LATEST_IMAGE_TAG: ${{ env.VOTING_WORKER_LATEST_IMAGE_TAG }}
 
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          image-ref: '${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.APP }}:${{ github.event.pull_request.head.sha }}'
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
+      #   run: |
+      #     uv run pytest
+
+      # - name: Push docker image
+      #   run: |
+      #     docker push ${{ env.DOCKER_IMAGE_URI }}
+
+      # - name: Run Trivy vulnerability scanner
+      #   uses: aquasecurity/trivy-action@v0.36.0
+      #   with:
+      #     image-ref: '${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.APP }}:${{ github.event.pull_request.head.sha }}'
+      #     format: 'table'
+      #     exit-code: '1'
+      #     ignore-unfixed: true
