@@ -43,5 +43,5 @@ ENTRYPOINT ["uv"]
 
 ##No sync used to ensure that it uses the existing .venv and doesnt install dependencies at runtime
 ##Single worker so in-process Prometheus counters aren't split across processes (avoids needing multiprocess mode)
-CMD ["run", "--no-sync", "gunicorn", "--bind", "0.0.0.0:80", "--workers", "1", "--threads", "8", "app:app"]
+CMD ["run", "--no-sync", "gunicorn", "--bind", "0.0.0.0:80", "--workers", "1", "--threads", "8", "src.app:app"]
 ##Tests stability of container with additional workers. If works will need to sort prometheus after..
