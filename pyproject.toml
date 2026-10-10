@@ -18,7 +18,7 @@ dependencies = [
     "pyyaml>=6.0.3",
     "redis~=8.1.0",
     "ruff>=0.16.4",
-    "werkzeug>=3.1.8",
+    "werkzeug>=3.1.9",
 ]
 
 [tool.pytest.ini_options]
